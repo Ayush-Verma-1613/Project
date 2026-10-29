@@ -1,6 +1,7 @@
 const PRODUCTION_API_URL = 'https://project-six-rust-94.vercel.app';
-const BASE_URL =
+const configuredBaseUrl =
   import.meta.env.VITE_API_BASE_URL || (import.meta.env.PROD ? PRODUCTION_API_URL : '');
+const BASE_URL = configuredBaseUrl.replace(/\/+$/, '');
 
 /**
  * Thin fetch wrapper. Throws an Error carrying `fieldErrors` when the API
