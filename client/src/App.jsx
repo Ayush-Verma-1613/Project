@@ -2,11 +2,44 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import AppointmentForm from './components/AppointmentForm.jsx';
 import AppointmentList from './components/AppointmentList.jsx';
 import Toolbar from './components/Toolbar.jsx';
-import { CalendarIcon } from './components/Icons.jsx';
+import appointmentHero from './assets/appointment-hero.png';
+import {
+  CalendarIcon,
+  CheckCircleIcon,
+  ClockIcon,
+  MoonIcon,
+  PlusIcon,
+  SunIcon,
+  XCircleIcon,
+} from './components/Icons.jsx';
 import { STATUSES } from './constants.js';
 import { api } from './api/client.js';
 
+function StatCard({ label, value, tone, Icon }) {
+  return (
+    <div className={`stat stat--${tone}`}>
+      <div className="stat__content">
+        <span className="stat__icon" aria-hidden="true">
+          <Icon />
+        </span>
+        <div className="stat__copy">
+          <div className="stat__label">{label}</div>
+          <div className="stat__value">{value}</div>
+          <div className="stat__trend" aria-label="No change">
+            <span aria-hidden="true">↗</span> +0%
+          </div>
+        </div>
+      </div>
+      <svg className="stat__spark" viewBox="0 0 140 54" preserveAspectRatio="none" aria-hidden="true">
+        <path d="M0 49 C18 47 19 24 38 25 C56 26 56 40 75 37 C93 34 96 12 114 14 C128 15 130 25 140 21" />
+        <path className="stat__spark-fill" d="M0 49 C18 47 19 24 38 25 C56 26 56 40 75 37 C93 34 96 12 114 14 C128 15 130 25 140 21 L140 54 L0 54 Z" />
+      </svg>
+    </div>
+  );
+}
+
 export default function App() {
+  const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'light');
   const [appointments, setAppointments] = useState([]);
   const [filter, setFilter] = useState('All');
   const [search, setSearch] = useState('');
@@ -50,6 +83,11 @@ export default function App() {
   }, [debouncedSearch, load]);
 
   useEffect(() => () => clearTimeout(toastTimer.current), []);
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    localStorage.setItem('theme', theme);
+  }, [theme]);
 
   const counts = useMemo(() => {
     const result = { All: appointments.length };
@@ -112,15 +150,30 @@ export default function App() {
             <CalendarIcon width={22} height={22} />
           </span>
           <div>
-            <h1 className="brand__title">Appointment Manager</h1>
-            <p className="brand__subtitle">Schedule, track and update customer appointments</p>
+            <h1 className="brand__title">
+              Appointment <span>Manager</span>
+            </h1>
+            <p className="brand__subtitle">Schedule, track and manage your customer appointments efficiently.</p>
           </div>
         </div>
 
-        <span className="status-pill">
-          <span className={`status-pill__dot${apiOnline ? '' : ' status-pill__dot--off'}`} />
-          {apiOnline ? 'API connected' : 'API unreachable'}
-        </span>
+        <div className="masthead__actions">
+          <button
+            type="button"
+            className="theme-toggle"
+            onClick={() => setTheme((current) => (current === 'light' ? 'dark' : 'light'))}
+            aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} theme`}
+            title={`Switch to ${theme === 'light' ? 'dark' : 'light'} theme`}
+          >
+            {theme === 'light' ? <MoonIcon /> : <SunIcon />}
+            <span>{theme === 'light' ? 'Dark' : 'Light'}</span>
+          </button>
+
+          <span className="status-pill">
+            <span className={`status-pill__dot${apiOnline ? '' : ' status-pill__dot--off'}`} />
+            {apiOnline ? 'API Connected' : 'API Unreachable'}
+          </span>
+        </div>
       </header>
 
       {error && (
@@ -129,46 +182,52 @@ export default function App() {
         </p>
       )}
 
-      <section className="stats" aria-label="Appointment summary">
-        <div className="stat">
-          <div className="stat__label">Total</div>
-          <div className="stat__value">{counts.All}</div>
+      <section className="overview">
+        <div className="stats" aria-label="Appointment summary">
+          <StatCard label="Total appointments" value={counts.All} tone="total" Icon={CalendarIcon} />
+          <StatCard label="Pending" value={counts.Pending} tone="pending" Icon={ClockIcon} />
+          <StatCard label="Confirmed" value={counts.Confirmed} tone="confirmed" Icon={CheckCircleIcon} />
+          <StatCard label="Cancelled" value={counts.Cancelled} tone="cancelled" Icon={XCircleIcon} />
         </div>
-        <div className="stat stat--pending">
-          <div className="stat__label">Pending</div>
-          <div className="stat__value">{counts.Pending}</div>
-        </div>
-        <div className="stat stat--confirmed">
-          <div className="stat__label">Confirmed</div>
-          <div className="stat__value">{counts.Confirmed}</div>
-        </div>
-        <div className="stat stat--cancelled">
-          <div className="stat__label">Cancelled</div>
-          <div className="stat__value">{counts.Cancelled}</div>
+        <div className="overview__art" aria-hidden="true">
+          <span className="overview__orb overview__orb--one" />
+          <span className="overview__orb overview__orb--two" />
+          <img src={appointmentHero} alt="" />
         </div>
       </section>
 
       <div className="layout">
-        <section className="panel" aria-labelledby="form-title">
+        <section className="panel panel--booking" aria-labelledby="form-title">
           <div className="panel__header">
-            <h2 className="panel__title" id="form-title">
-              New appointment
-            </h2>
-            <p className="panel__hint">All fields are required.</p>
+            <div className="panel__heading">
+              <span className="panel__icon" aria-hidden="true">
+                <PlusIcon />
+              </span>
+              <div>
+                <h2 className="panel__title" id="form-title">
+                  Book New Appointment
+                </h2>
+                <p className="panel__hint">Fill in the details to schedule a new appointment.</p>
+              </div>
+            </div>
           </div>
           <AppointmentForm onCreate={handleCreate} />
         </section>
 
-        <section className="panel" aria-labelledby="list-title">
-          <div className="panel__header">
-            <h2 className="panel__title" id="list-title">
+        <section className="panel panel--appointments" aria-labelledby="list-title">
+          <div className="panel__header panel__header--appointments">
+            <div className="appointments-heading">
+              <h2 className="panel__title panel__title--with-icon" id="list-title">
+              <span className="panel__icon" aria-hidden="true">
+                <CalendarIcon />
+              </span>
               Appointments
-            </h2>
-            <p className="panel__hint">
-              Showing {visible.length} of {counts.All}
+              </h2>
+              <p className="panel__hint">
+              Showing {visible.length} of {counts.All} {counts.All === 1 ? 'appointment' : 'appointments'}
               {debouncedSearch ? ` matching “${debouncedSearch}”` : ''}
-            </p>
-          </div>
+              </p>
+            </div>
 
           <Toolbar
             filter={filter}
@@ -177,6 +236,7 @@ export default function App() {
             onSearchChange={setSearch}
             counts={counts}
           />
+          </div>
 
           <AppointmentList
             appointments={visible}

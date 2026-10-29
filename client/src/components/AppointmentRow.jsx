@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { STATUSES } from '../constants.js';
 import { formatDateTime, initials } from '../utils/format.js';
-import { TrashIcon } from './Icons.jsx';
+import { CalendarIcon, TrashIcon } from './Icons.jsx';
 
 export default function AppointmentRow({ appointment, onStatusChange, onDelete }) {
   const [busy, setBusy] = useState(false);
@@ -36,7 +36,7 @@ export default function AppointmentRow({ appointment, onStatusChange, onDelete }
           <p className="appointment__meta">
             <span>{appointment.service}</span>
             <span className="appointment__sep">•</span>
-            <span>{formatDateTime(appointment.dateTime)}</span>
+            <span className="appointment__date"><CalendarIcon />{formatDateTime(appointment.dateTime)}</span>
           </p>
         </div>
       </div>

@@ -1,5 +1,15 @@
 import { useState } from 'react';
 import { STATUSES, SERVICES } from '../constants.js';
+import {
+  ArrowRightIcon,
+  BriefcaseIcon,
+  CalendarIcon,
+  CheckCircleIcon,
+  ClockIcon,
+  SendIcon,
+  UserIcon,
+  XCircleIcon,
+} from './Icons.jsx';
 
 const emptyForm = { customerName: '', service: '', dateTime: '', status: 'Pending' };
 
@@ -80,15 +90,18 @@ export default function AppointmentForm({ onCreate }) {
         <label className="field__label" htmlFor="customerName">
           Customer name
         </label>
-        <input
-          id="customerName"
-          className={invalid('customerName')}
-          value={form.customerName}
-          onChange={(event) => setField('customerName', event.target.value)}
-          placeholder="e.g. Alex Morgan"
-          aria-invalid={Boolean(errors.customerName)}
-          aria-describedby={describedBy('customerName')}
-        />
+        <div className="field__input-wrap">
+          <span className="field__icon" aria-hidden="true"><UserIcon /></span>
+          <input
+            id="customerName"
+            className={`${invalid('customerName')} field__control--with-icon`}
+            value={form.customerName}
+            onChange={(event) => setField('customerName', event.target.value)}
+            placeholder="e.g. Alex Morgan"
+            aria-invalid={Boolean(errors.customerName)}
+            aria-describedby={describedBy('customerName')}
+          />
+        </div>
         {errors.customerName && (
           <p className="field__error" id="customerName-error" role="alert">
             {errors.customerName}
@@ -100,16 +113,19 @@ export default function AppointmentForm({ onCreate }) {
         <label className="field__label" htmlFor="service">
           Service
         </label>
-        <input
-          id="service"
-          className={invalid('service')}
-          list="service-options"
-          value={form.service}
-          onChange={(event) => setField('service', event.target.value)}
-          placeholder="e.g. Consultation"
-          aria-invalid={Boolean(errors.service)}
-          aria-describedby={describedBy('service')}
-        />
+        <div className="field__input-wrap">
+          <span className="field__icon" aria-hidden="true"><BriefcaseIcon /></span>
+          <input
+            id="service"
+            className={`${invalid('service')} field__control--with-icon`}
+            list="service-options"
+            value={form.service}
+            onChange={(event) => setField('service', event.target.value)}
+            placeholder="e.g. Consultation"
+            aria-invalid={Boolean(errors.service)}
+            aria-describedby={describedBy('service')}
+          />
+        </div>
         <datalist id="service-options">
           {SERVICES.map((service) => (
             <option key={service} value={service} />
@@ -126,15 +142,18 @@ export default function AppointmentForm({ onCreate }) {
         <label className="field__label" htmlFor="dateTime">
           Date and time
         </label>
-        <input
-          id="dateTime"
-          type="datetime-local"
-          className={invalid('dateTime')}
-          value={form.dateTime}
-          onChange={(event) => setField('dateTime', event.target.value)}
-          aria-invalid={Boolean(errors.dateTime)}
-          aria-describedby={describedBy('dateTime')}
-        />
+        <div className="field__input-wrap">
+          <span className="field__icon" aria-hidden="true"><CalendarIcon /></span>
+          <input
+            id="dateTime"
+            type="datetime-local"
+            className={`${invalid('dateTime')} field__control--with-icon`}
+            value={form.dateTime}
+            onChange={(event) => setField('dateTime', event.target.value)}
+            aria-invalid={Boolean(errors.dateTime)}
+            aria-describedby={describedBy('dateTime')}
+          />
+        </div>
         {errors.dateTime && (
           <p className="field__error" id="dateTime-error" role="alert">
             {errors.dateTime}
@@ -155,6 +174,9 @@ export default function AppointmentForm({ onCreate }) {
               aria-pressed={form.status === status}
               onClick={() => setField('status', status)}
             >
+              {status === 'Pending' && <ClockIcon />}
+              {status === 'Confirmed' && <CheckCircleIcon />}
+              {status === 'Cancelled' && <XCircleIcon />}
               {status}
             </button>
           ))}
@@ -167,7 +189,9 @@ export default function AppointmentForm({ onCreate }) {
       </div>
 
       <button type="submit" className="btn btn--primary" disabled={submitting}>
+        {!submitting && <SendIcon />}
         {submitting ? 'Adding…' : 'Add appointment'}
+        {!submitting && <ArrowRightIcon />}
       </button>
     </form>
   );

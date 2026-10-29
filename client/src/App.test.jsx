@@ -56,7 +56,7 @@ describe('Appointment Manager', () => {
     render(<App />);
     await screen.findByText('Alex Morgan');
 
-    const total = screen.getByText('Total').parentElement;
+    const total = screen.getByText('Total appointments').parentElement;
     expect(within(total).getByText('3')).toBeInTheDocument();
   });
 
@@ -226,6 +226,6 @@ describe('Appointment Manager', () => {
     render(<App />);
 
     expect(await screen.findByText(/cannot reach the api/i)).toBeInTheDocument();
-    expect(screen.getByText('API unreachable')).toBeInTheDocument();
+    expect(screen.getByText('API Unreachable')).toBeInTheDocument();
   });
 });
