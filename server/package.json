@@ -5,6 +5,9 @@
   "description": "Express API for the Appointment Manager assessment",
   "main": "src/index.js",
   "type": "module",
+  "engines": {
+    "node": "22.x"
+  },
   "scripts": {
     "dev": "node --watch src/index.js",
     "start": "node src/index.js",
