@@ -21,7 +21,7 @@ export const mongoStore = {
       throw new Error('MONGODB_URI is required when PERSISTENCE=mongo.');
     }
 
-    client = new MongoClient(config.mongodbUri);
+    client = new MongoClient(config.mongodbUri, { serverSelectionTimeoutMS: 8_000 });
     await client.connect();
     appointments = client.db().collection('appointments');
     await appointments.createIndex({ id: 1 }, { unique: true });

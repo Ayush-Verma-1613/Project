@@ -2,7 +2,6 @@ import { createApp } from './app.js';
 import { config } from './config.js';
 import { store } from './store/index.js';
 
-const app = createApp();
 let initialization;
 
 function initializeStore() {
@@ -10,16 +9,10 @@ function initializeStore() {
   return initialization;
 }
 
-/** Vercel invokes this handler for each API request. */
-export default async function handler(req, res) {
-  try {
-    await initializeStore();
-    return app(req, res);
-  } catch (error) {
-    console.error('Failed to connect to MongoDB:', error);
-    return res.status(500).json({ message: 'Database connection failed.' });
-  }
-}
+const app = createApp({ initialize: initializeStore });
+
+// Vercel recognizes this as the Express application for its serverless function.
+export default app;
 
 async function bootstrap() {
   await initializeStore();
