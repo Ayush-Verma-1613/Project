@@ -1,17 +1,8 @@
-import { createApp } from './app.js';
+import { app, initializeStore } from './app.js';
 import { config } from './config.js';
 import { store } from './store/index.js';
 
-let initialization;
-
-function initializeStore() {
-  initialization ??= store.init();
-  return initialization;
-}
-
-const app = createApp({ initialize: initializeStore });
-
-// Vercel recognizes this as the Express application for its serverless function.
+// Kept as an entry point for local Node.js development.
 export default app;
 
 async function bootstrap() {

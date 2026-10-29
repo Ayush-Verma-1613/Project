@@ -38,3 +38,14 @@ export function createApp({ initialize } = {}) {
 
   return app;
 }
+
+let initialization;
+
+export function initializeStore() {
+  initialization ??= store.init();
+  return initialization;
+}
+
+// Vercel detects src/app.js as the Express entry point.
+export const app = createApp({ initialize: initializeStore });
+export default app;
