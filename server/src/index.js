@@ -2,10 +2,27 @@ import { createApp } from './app.js';
 import { config } from './config.js';
 import { store } from './store/index.js';
 
-async function bootstrap() {
-  await store.init();
+const app = createApp();
+let initialization;
 
-  const app = createApp();
+function initializeStore() {
+  initialization ??= store.init();
+  return initialization;
+}
+
+/** Vercel invokes this handler for each API request. */
+export default async function handler(req, res) {
+  try {
+    await initializeStore();
+    return app(req, res);
+  } catch (error) {
+    console.error('Failed to connect to MongoDB:', error);
+    return res.status(500).json({ message: 'Database connection failed.' });
+  }
+}
+
+async function bootstrap() {
+  await initializeStore();
   app.listen(config.port, () => {
     console.log(`API listening on http://localhost:${config.port}`);
     console.log(
@@ -16,7 +33,9 @@ async function bootstrap() {
   });
 }
 
-bootstrap().catch((error) => {
-  console.error('Failed to start server:', error);
-  process.exit(1);
-});
+if (!process.env.VERCEL) {
+  bootstrap().catch((error) => {
+    console.error('Failed to start server:', error);
+    process.exit(1);
+  });
+}
